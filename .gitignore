@@ -22,3 +22,9 @@ go.work
 
 panop.yaml
 panopticon
+
+
+node_modules
+
+web/page/static/output.css
+

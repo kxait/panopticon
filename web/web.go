@@ -29,8 +29,12 @@ func (p *PanelServer) Serve() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
+	e.Static("/static", "web/page/static")
+
+	templates, _ := template.ParseGlob("web/page/fragments/*.html")
+	templates, _ = templates.ParseGlob("web/page/*.html")
 	t := &Template{
-		templates: template.Must(template.ParseGlob("web/page/*.html")),
+		templates: templates,
 	}
 
 	e.Renderer = t
