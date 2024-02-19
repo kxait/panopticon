@@ -21,7 +21,8 @@ func MapConfig(c *Config) *Bussin {
 	}
 
 	return &Bussin{
-		AvailableProcesses: procs,
-		RunningProcesses:   runningProcesses,
+		AvailableProcesses:    procs,
+		RunningProcesses:      runningProcesses,
+		ProcessStatusNotifier: make(chan ProcessStatusNotification),
 	}
 }

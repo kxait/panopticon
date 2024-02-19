@@ -40,6 +40,7 @@ func (p *PanelServer) Serve() {
 	e.GET("/", p.Index)
 	e.POST("/start", p.Start)
 	e.POST("/stop", p.Stop)
+	e.GET("/process-status", p.ProcessStatus)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }

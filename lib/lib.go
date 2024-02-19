@@ -11,9 +11,15 @@ import (
 	"golang.org/x/exp/slices"
 )
 
+type ProcessStatusNotification struct {
+	Name    string
+	Running bool
+}
+
 type Bussin struct {
-	AvailableProcesses []Process
-	RunningProcesses   []RunningProcess
+	AvailableProcesses    []Process
+	RunningProcesses      []RunningProcess
+	ProcessStatusNotifier chan ProcessStatusNotification
 }
 
 type Process struct {
@@ -82,13 +88,23 @@ func (b *Bussin) StartProcess(name string) (RunningProcess, error) {
 		return RunningProcess{}, err
 	}
 
-	cmd.Dir = proc.Cwd
+	if proc.Cwd != "" {
+		cmd.Dir = proc.Cwd
+	}
+
 	cmd.Stdout = logFile
 	cmd.Stderr = logFile
 
 	cmd.Env = proc.Env
 
 	cmd.Start()
+
+	go func() {
+		b.ProcessStatusNotifier <- ProcessStatusNotification{
+			Name:    name,
+			Running: true,
+		}
+	}()
 
 	running := RunningProcess{
 		Proc:     proc,
@@ -108,6 +124,12 @@ func (b *Bussin) StartProcess(name string) (RunningProcess, error) {
 				b.RunningProcesses[i].Finished = true
 			}
 		}
+		go func() {
+			b.ProcessStatusNotifier <- ProcessStatusNotification{
+				Name:    name,
+				Running: false,
+			}
+		}()
 
 		exitErr = err
 		running.LogFile.Close()
