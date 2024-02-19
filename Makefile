@@ -23,4 +23,4 @@ watch_tailwind:
 	npx tailwind -i ./web/page/tailwind-src/main.css -o ./web/page/static/output.css --watch
 
 watch_program:
-	wgo run -file .html .
+	wgo run -file .html . $(PANOP)

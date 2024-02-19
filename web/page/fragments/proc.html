@@ -1,0 +1,27 @@
+{{ define "proc" }}
+<div class="grid grid-cols-2 gap-4">
+  <div>
+    {{ if .HasLogs }}
+    <a href="/logs?name={{ .Name }}">{{ .Name }}</a>
+    {{ else }}
+    {{ .Name }}
+    {{ end }}
+  </div>
+  {{ if .Running }}
+  <div class="flex">
+    <div>
+      ✅
+    </div>
+    <button hx-swap="outerHTML" hx-target="closest .grid" hx-post="/stop?proc={{ .Name }}">
+      ⏹️
+    </button>
+  </div>
+  {{ else }}
+  <div>
+    <button hx-swap="outerHTML" hx-target="closest .grid" hx-post="/start?proc={{ .Name }}">
+      ⏩️
+    </button>
+  </div>
+  {{ end }}
+</div>
+{{ end }}

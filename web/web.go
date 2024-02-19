@@ -1,10 +1,8 @@
 package web
 
 import (
-	"fmt"
 	"html/template"
 	"io"
-	"net/http"
 	"panopticon/lib"
 
 	"github.com/labstack/echo/v4"
@@ -27,7 +25,7 @@ func (p *PanelServer) Serve() {
 	e := echo.New()
 
 	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
+	//e.Use(middleware.Recover())
 
 	e.Static("/static", "web/page/static")
 
@@ -39,23 +37,9 @@ func (p *PanelServer) Serve() {
 
 	e.Renderer = t
 
-	e.GET("/", p.index)
+	e.GET("/", p.Index)
+	e.POST("/start", p.Start)
+	e.POST("/stop", p.Stop)
 
 	e.Logger.Fatal(e.Start(":8080"))
-}
-
-func (p *PanelServer) index(c echo.Context) error {
-	availableProcesses, err := p.Runner.GetAvailableProcesses()
-	if err != nil {
-		return fmt.Errorf("could not get available processes!")
-	}
-
-	processNames := make([]string, len(availableProcesses))
-	for k, v := range availableProcesses {
-		processNames[k] = v.Name
-	}
-
-	return c.Render(http.StatusOK, "index.html", map[string]interface{}{
-		"procs": processNames,
-	})
 }

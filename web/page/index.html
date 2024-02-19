@@ -2,26 +2,10 @@
 
 <body>
   <h1>Hello world!!!</h1>
-  <div>
+  <div class="container max-w-xl" hx-ws="connect:/process-status">
 
     {{ range .procs }}
-    <div class="flex">
-      <div>
-        {{ . }}
-      </div>
-      <div>
-        🔴
-      </div>
-      <div>
-        ✅
-      </div>
-      <div>
-        ⏹️
-      </div>
-      <div>
-        ⏩️
-      </div>
-    </div>
+    {{ template "proc" . }}
     {{ end }}
 
   </div>
