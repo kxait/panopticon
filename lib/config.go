@@ -11,12 +11,13 @@ import (
 type ConfigProc struct {
 	Name string   `yaml:"name"`
 	Cmd  string   `yaml:"cmd"`
+	Cwd  string   `yaml:"cwd"`
 	Args []string `yaml:"args"`
 }
 
 type Config struct {
-	Procs []ConfigProc `yaml:"procs"`
-	Env   []string     `yaml:"env"`
+	Procs []ConfigProc      `yaml:"procs"`
+	Env   map[string]string `yaml:"env"`
 }
 
 func ReadConfig(path string) (*Config, error) {

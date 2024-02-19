@@ -19,6 +19,7 @@ type Bussin struct {
 type Process struct {
 	Name string
 	Cmd  string
+	Cwd  string
 	Args []string
 	Env  []string
 }
@@ -81,6 +82,7 @@ func (b *Bussin) StartProcess(name string) (RunningProcess, error) {
 		return RunningProcess{}, err
 	}
 
+	cmd.Dir = proc.Cwd
 	cmd.Stdout = logFile
 	cmd.Stderr = logFile
 

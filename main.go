@@ -2,14 +2,22 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"panopticon/lib"
 	"panopticon/web"
 )
 
 func main() {
-	rawConfig, err := lib.ReadConfig("panop.yaml")
+	var path string
+	if len(os.Args) > 1 {
+		path = os.Args[1]
+	} else {
+		path = "panop.yaml"
+	}
+
+	rawConfig, err := lib.ReadConfig(path)
 	if err != nil {
-		panic("could not read config panop.yaml")
+		panic(fmt.Sprintf("could not read config %s (%s)", path, err.Error()))
 	}
 
 	config := lib.MapConfig(rawConfig)
