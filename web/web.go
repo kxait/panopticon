@@ -38,12 +38,15 @@ func (p *PanelServer) Serve() {
 	e.Use(middleware.Logger())
 	//e.Use(middleware.Recover())
 
-	e.StaticFS("/static", static)
+	staticFs := echo.MustSubFS(static, "page/static/")
+	e.StaticFS("/static", staticFs)
 
 	//templates, _ := template.ParseGlob("web/page/fragments/*.html")
-	templates, _ := template.ParseFS(fragments)
+	fragmentsFs := echo.MustSubFS(fragments, "page/fragments/")
+	templates, _ := template.ParseFS(fragmentsFs, "*.html")
 	//templates, _ = templates.ParseGlob("web/page/*.html")
-	templates, _ = templates.ParseFS(page)
+	pageFs := echo.MustSubFS(page, "page/")
+	templates, _ = templates.ParseFS(pageFs, "*.html")
 	t := &Template{
 		templates: templates,
 	}

@@ -5,7 +5,7 @@
   <div class="text-xl">{{ .Name }} ({{ .LogPath }})</div>
   <script>
     let scroll = false
-    toggleScroll = () => {
+    const toggleScroll = () => {
       scroll = !scroll
       document.getElementById("btn").innerText = scroll ? "✅" : "🔽"
     }
@@ -15,7 +15,7 @@
     })
 
   </script>
-  <div style="font-family: monospace;" id="lines" class="container m-auto break-all" hx-ext="ws"
+  <div id="lines" class="container text-sm m-auto break-all font-mono" hx-ext="ws"
     ws-connect="/logs-live?proc={{.Name}}&offset={{.Size}}">
     {{ range .Lines }}
     <div>

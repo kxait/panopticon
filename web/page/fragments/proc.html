@@ -2,7 +2,7 @@
 <tr id="proc--{{ .Name }}" class="bg-white odd:bg-gray-100">
   <td>
     {{ if .HasLogs }}
-    <a href="/logs?proc={{ .Name }}">{{ .Name }}</a>
+    <a class="font-bold" href="/logs?proc={{ .Name }}">{{ .Name }}</a>
     {{ else }}
     {{ .Name }}
     {{ end }}
