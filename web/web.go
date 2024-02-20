@@ -2,6 +2,7 @@ package web
 
 import (
 	"context"
+	"embed"
 	"html/template"
 	"io"
 	"panopticon/lib"
@@ -9,6 +10,15 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
+
+//go:embed page/fragments
+var fragments embed.FS
+
+//go:embed page
+var page embed.FS
+
+//go:embed page/static
+var static embed.FS
 
 type PanelServer struct {
 	Runner *lib.Bussin
@@ -28,10 +38,12 @@ func (p *PanelServer) Serve() {
 	e.Use(middleware.Logger())
 	//e.Use(middleware.Recover())
 
-	e.Static("/static", "web/page/static")
+	e.StaticFS("/static", static)
 
-	templates, _ := template.ParseGlob("web/page/fragments/*.html")
-	templates, _ = templates.ParseGlob("web/page/*.html")
+	//templates, _ := template.ParseGlob("web/page/fragments/*.html")
+	templates, _ := template.ParseFS(fragments)
+	//templates, _ = templates.ParseGlob("web/page/*.html")
+	templates, _ = templates.ParseFS(page)
 	t := &Template{
 		templates: templates,
 	}
