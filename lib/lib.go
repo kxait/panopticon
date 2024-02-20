@@ -100,12 +100,12 @@ func (b *Bussin) StartProcess(name string) (RunningProcess, error) {
 
 	cmd.Start()
 
-	go func() {
+	go func(name string) {
 		b.ProcessStatusNotifierSource <- ProcessStatusNotification{
 			Name:    name,
 			Running: true,
 		}
-	}()
+	}(name)
 
 	running := RunningProcess{
 		Proc:     proc,
@@ -116,12 +116,12 @@ func (b *Bussin) StartProcess(name string) (RunningProcess, error) {
 	}
 
 	var exitErr error
-	go func() {
+	go func(name string, running RunningProcess) {
 		err := cmd.Wait()
 		// if we're here, it exited...
 
 		for i, runningProc := range b.RunningProcesses {
-			if runningProc.Proc.Name == proc.Name {
+			if runningProc.Proc.Name == name {
 				b.RunningProcesses[i].Finished = true
 			}
 		}
@@ -134,7 +134,7 @@ func (b *Bussin) StartProcess(name string) (RunningProcess, error) {
 
 		exitErr = err
 		running.LogFile.Close()
-	}()
+	}(proc.Name, running)
 
 	// remove the previous (finished) process from the proc list so we can add the new one
 	for k, v := range b.RunningProcesses {

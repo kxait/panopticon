@@ -3,14 +3,26 @@ procs:
     name: ls
     cmd: ls
   -
+    name: ls2
+    cmd: sh
+    args:
+      - -c
+      - ls && sleep 1
+  -
     name: system log
     cmd: tail
     args:
       - '-f'
-      - /var/log/system.log
+      - /var/log/syslog
   -
     name: funky
     cmd: sh
     args:
       - -c
       - while true; do echo $(date -u); sleep 0.1; done
+  -
+    name: sleepyhead
+    cmd: sh
+    args:
+      - -c
+      - sleep 5

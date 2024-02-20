@@ -42,6 +42,8 @@ func (p *PanelServer) Serve() {
 	e.POST("/start", p.Start)
 	e.POST("/stop", p.Stop)
 	e.GET("/process-status", p.ProcessStatus)
+	e.GET("/logs", p.Logs)
+	e.GET("/logs-live", p.LogsLive)
 
 	ctx, done := context.WithCancel(context.Background())
 	go func() { p.Runner.ProcessStatusNotifier.Serve(p.Runner.ProcessStatusNotifierSource, ctx) }()

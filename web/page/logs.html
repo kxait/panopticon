@@ -1,0 +1,27 @@
+{{ template "head" }}
+
+<body>
+  <div><a href="/">&lt;&lt; return</a></div>
+  <div class="text-xl">{{ .Name }} ({{ .LogPath }})</div>
+  <script>
+    let scroll = false
+    toggleScroll = () => {
+      scroll = !scroll
+      document.getElementById("btn").innerText = scroll ? "✅" : "🔽"
+    }
+    document.addEventListener("htmx:wsAfterMessage", ({detail}) => {
+      if (scroll)
+        window.scrollTo(0, document.body.scrollHeight)
+    })
+
+  </script>
+  <div style="font-family: monospace;" id="lines" class="container m-auto break-all" hx-ext="ws"
+    ws-connect="/logs-live?proc={{.Name}}&offset={{.Size}}">
+    {{ range .Lines }}
+    <div>
+      {{ . }}
+    </div>
+    {{ end }}
+  </div>
+  <div id="scroll-me" class="fixed bottom-[0] text-2xl"><button id="btn" onclick="toggleScroll()">⬇</button></div>
+</body>

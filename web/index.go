@@ -27,7 +27,7 @@ func (p *PanelServer) Index(c echo.Context) error {
 	procs := make([]ProcessViewModel, len(availableProcesses))
 
 	for k, v := range availableProcesses {
-		var maybeRunningProc *lib.RunningProcess
+		var maybeRunningProc *lib.RunningProcess = nil
 		for _, vv := range runningProcs {
 			if v.Name == vv.Proc.Name {
 				maybeRunningProc = &vv

@@ -1,12 +1,13 @@
 {{ template "head" }}
 
 <body>
-  <h1>Hello world!!!</h1>
-  <div class="container max-w-xl" hx-ws="connect:/process-status">
+  <div class="container m-auto max-w-xl" hx-ws="connect:/process-status">
+    <table>
 
-    {{ range .procs }}
-    {{ template "proc" . }}
-    {{ end }}
+      {{ range .procs }}
+      {{ template "proc" . }}
+      {{ end }}
+    </table>
 
   </div>
 </body>
