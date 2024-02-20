@@ -17,9 +17,10 @@ type ProcessStatusNotification struct {
 }
 
 type Bussin struct {
-	AvailableProcesses    []Process
-	RunningProcesses      []RunningProcess
-	ProcessStatusNotifier chan ProcessStatusNotification
+	AvailableProcesses          []Process
+	RunningProcesses            []RunningProcess
+	ProcessStatusNotifier       Broadcaster[ProcessStatusNotification]
+	ProcessStatusNotifierSource chan ProcessStatusNotification
 }
 
 type Process struct {
@@ -100,7 +101,7 @@ func (b *Bussin) StartProcess(name string) (RunningProcess, error) {
 	cmd.Start()
 
 	go func() {
-		b.ProcessStatusNotifier <- ProcessStatusNotification{
+		b.ProcessStatusNotifierSource <- ProcessStatusNotification{
 			Name:    name,
 			Running: true,
 		}
@@ -125,7 +126,7 @@ func (b *Bussin) StartProcess(name string) (RunningProcess, error) {
 			}
 		}
 		go func() {
-			b.ProcessStatusNotifier <- ProcessStatusNotification{
+			b.ProcessStatusNotifierSource <- ProcessStatusNotification{
 				Name:    name,
 				Running: false,
 			}

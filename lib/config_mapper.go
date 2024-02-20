@@ -20,9 +20,11 @@ func MapConfig(c *Config) *Bussin {
 		}
 	}
 
+	sauce := make(chan ProcessStatusNotification)
 	return &Bussin{
-		AvailableProcesses:    procs,
-		RunningProcesses:      runningProcesses,
-		ProcessStatusNotifier: make(chan ProcessStatusNotification),
+		AvailableProcesses:          procs,
+		RunningProcesses:            runningProcesses,
+		ProcessStatusNotifierSource: sauce,
+		ProcessStatusNotifier:       Broadcaster[ProcessStatusNotification]{},
 	}
 }

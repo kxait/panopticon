@@ -10,18 +10,23 @@ import (
 func (p *PanelServer) ProcessStatus(c echo.Context) error {
 	websocket.Handler(func(ws *websocket.Conn) {
 		defer ws.Close()
+		listener := p.Runner.ProcessStatusNotifier.Subscribe()
+		defer p.Runner.ProcessStatusNotifier.Unsubscribe(listener)
 		for {
-			notif := <-p.Runner.ProcessStatusNotifier
-			msg, err := json.Marshal(notif)
-			if err != nil {
-				c.Logger().Error(err)
-				break
-			}
-			err = websocket.Message.Send(ws, string(msg))
-			if err != nil {
-				c.Logger().Error(err)
-				p.Runner.ProcessStatusNotifier <- notif
-				break
+			select {
+			case notif := <-listener:
+				{
+					msg, err := json.Marshal(notif)
+					if err != nil {
+						c.Logger().Error(err)
+						break
+					}
+					err = websocket.Message.Send(ws, string(msg))
+					if err != nil {
+						c.Logger().Error(err)
+						break
+					}
+				}
 			}
 		}
 	}).ServeHTTP(c.Response(), c.Request())

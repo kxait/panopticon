@@ -1,6 +1,7 @@
 package web
 
 import (
+	"context"
 	"html/template"
 	"io"
 	"panopticon/lib"
@@ -42,5 +43,9 @@ func (p *PanelServer) Serve() {
 	e.POST("/stop", p.Stop)
 	e.GET("/process-status", p.ProcessStatus)
 
+	ctx, done := context.WithCancel(context.Background())
+	go func() { p.Runner.ProcessStatusNotifier.Serve(p.Runner.ProcessStatusNotifierSource, ctx) }()
+
 	e.Logger.Fatal(e.Start(":8080"))
+	done()
 }
