@@ -3,11 +3,9 @@
 <body>
   <div class="container m-auto max-w-xl" hx-ws="connect:/process-status">
     <table>
-
       {{ range .procs }}
       {{ template "proc" . }}
       {{ end }}
     </table>
-
   </div>
 </body>
