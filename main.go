@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/signal"
 	"panopticon/lib"
 	"panopticon/web"
+	"syscall"
 )
 
 func main() {
@@ -26,6 +28,33 @@ func main() {
 	server := web.PanelServer{
 		Runner: config,
 	}
+
+	// IF I DIE ALL THE KIDS DIE TOO
+	sigchnl := make(chan os.Signal, 1)
+	signal.Notify(sigchnl)
+
+	go func() {
+		for {
+			sig := <-sigchnl
+			switch sig {
+
+			case syscall.SIGCHLD:
+			case syscall.SIGURG:
+			case syscall.SIGPIPE:
+				break
+			default:
+				{
+					fmt.Printf("%+v\n", sig)
+					errs := config.KillAllChildren(syscall.SIGTERM)
+					for _, v := range errs {
+						fmt.Printf("error reaping process: %s\n", v.Error())
+					}
+					fmt.Println("goodbye!")
+					os.Exit(0)
+				}
+			}
+		}
+	}()
 
 	server.Serve()
 }

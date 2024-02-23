@@ -3,7 +3,8 @@ package web
 import (
 	"fmt"
 	"net/http"
-	"os"
+	"panopticon/lib"
+	"syscall"
 
 	"github.com/labstack/echo/v4"
 )
@@ -32,20 +33,25 @@ func (p *PanelServer) Stop(c echo.Context) error {
 	if err != nil {
 		return fmt.Errorf("could not get running processes list")
 	}
-	exists = false
+
+	var maybeRunningProcess *lib.RunningProcess
 	for _, v := range runningProcesses {
 		if v.Proc.Name == name {
-			exists = true
+			maybeRunningProcess = &v
+			break
 		}
 	}
-	if !exists {
+
+	if maybeRunningProcess == nil {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("proc not running %s", name))
 	}
 
-	err = p.Runner.KillProcess(name, os.Kill)
+	err = p.Runner.KillProcess(name, syscall.SIGKILL)
 	if err != nil {
-		return fmt.Errorf("could not start process %s: '%s'", name, err.Error())
+		return fmt.Errorf("could not stop process %s: '%s'", name, err.Error())
 	}
+
+	maybeRunningProcess.Cmd.Wait()
 
 	return c.Render(http.StatusOK, "proc", ProcessViewModel{
 		Name:    name,

@@ -1,6 +1,8 @@
 package lib
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func MapConfig(c *Config) *Bussin {
 	procs := make([]Process, len(c.Procs))
