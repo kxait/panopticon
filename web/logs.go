@@ -2,17 +2,19 @@ package web
 
 import (
 	"fmt"
+	"html/template"
 	"net/http"
 	"os"
 	"panopticon/lib"
 	"strings"
 
+	terminal "github.com/buildkite/terminal-to-html"
 	"github.com/labstack/echo/v4"
 )
 
 type LogsViewModel struct {
 	Name    string
-	Lines   []string
+	Lines   []template.HTML
 	Size    int
 	LogPath string
 }
@@ -57,10 +59,14 @@ func (p *PanelServer) Logs(c echo.Context) error {
 
 	// TODO: optimize
 	lines := strings.Split(strings.ReplaceAll(string(data), "\r", ""), "\n")
+	linesEscaped := make([]template.HTML, len(lines))
+	for k, v := range lines {
+		linesEscaped[k] = template.HTML(terminal.Render([]byte(v)))
+	}
 
 	return c.Render(http.StatusOK, "logs.html", LogsViewModel{
 		Name:    name,
-		Lines:   lines,
+		Lines:   linesEscaped,
 		Size:    len(data),
 		LogPath: maybeRunningProc.LogPath,
 	})

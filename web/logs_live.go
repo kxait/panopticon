@@ -3,10 +3,12 @@ package web
 import (
 	"bytes"
 	"fmt"
+	"html/template"
 	"net/http"
 	"panopticon/lib"
 	"strconv"
 
+	terminal "github.com/buildkite/terminal-to-html"
 	"github.com/hpcloud/tail"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/net/websocket"
@@ -46,11 +48,14 @@ func (p *PanelServer) LogsLive(c echo.Context) error {
 			Location: &tail.SeekInfo{
 				Offset: int64(offset),
 			},
+			Poll:   true,
+			ReOpen: true,
 		})
 
 		for line := range t.Lines {
 			x := bytes.NewBuffer([]byte{})
-			c.Echo().Renderer.Render(x, "log_line", line.Text, c)
+			line := template.HTML(terminal.Render([]byte(line.Text)))
+			c.Echo().Renderer.Render(x, "log_line", line, c)
 			websocket.Message.Send(ws, x.String())
 		}
 

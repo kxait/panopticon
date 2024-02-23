@@ -96,7 +96,12 @@ func (b *Bussin) StartProcess(name string) (RunningProcess, error) {
 	cmd.Stdout = logFile
 	cmd.Stderr = logFile
 
-	cmd.Env = proc.Env
+	for _, v := range os.Environ() {
+		cmd.Env = append(cmd.Env, v)
+	}
+	for _, v := range proc.Env {
+		cmd.Env = append(cmd.Env, v)
+	}
 
 	cmd.Start()
 
@@ -123,6 +128,7 @@ func (b *Bussin) StartProcess(name string) (RunningProcess, error) {
 		for i, runningProc := range b.RunningProcesses {
 			if runningProc.Proc.Name == name {
 				b.RunningProcesses[i].Finished = true
+				break
 			}
 		}
 		go func() {
@@ -153,30 +159,57 @@ func (b *Bussin) StartProcess(name string) (RunningProcess, error) {
 	return running, nil
 }
 
-func (b *Bussin) KillProcess(name string, sig os.Signal) error {
+func (b *Bussin) KillAllChildren(sig syscall.Signal) []error {
+	errs := make([]error, 0)
+	var maybeRunningProcess *RunningProcess
+
+	for _, v := range b.RunningProcesses {
+		if !b.isRunning(v.Proc.Name) {
+			continue
+		}
+
+		pgid, err := syscall.Getpgid(v.Cmd.Process.Pid)
+		if err != nil {
+			errs = append(errs, fmt.Errorf("could not get PGID of process %s PID %d reason: %s", v.Proc.Name, maybeRunningProcess.Cmd.Process.Pid, err.Error()))
+		}
+
+		err = syscall.Kill(-pgid, sig)
+		if err != nil {
+			errs = append(errs, err)
+		}
+
+		time.Sleep(100 * time.Millisecond)
+		if b.isRunning(v.Proc.Name) {
+			errs = append(errs, fmt.Errorf("process still lived 100ms after killing: %s", v.Proc.Name))
+		}
+	}
+
+	return errs
+}
+
+func (b *Bussin) KillProcess(name string, sig syscall.Signal) error {
 	if !b.isRunning(name) {
 		return fmt.Errorf("not running: %s", name)
 	}
 
-	var c RunningProcess
+	var maybeRunningProcess *RunningProcess
 	for _, v := range b.RunningProcesses {
 		if v.Proc.Name == name {
-			c = v
+			maybeRunningProcess = &v
+			break
 		}
 	}
+	if maybeRunningProcess == nil {
+		return fmt.Errorf("could not find process %s", name)
+	}
 
-	return c.Cmd.Process.Signal(sig)
+	pgid, err := syscall.Getpgid(maybeRunningProcess.Cmd.Process.Pid)
+	if err != nil {
+		return fmt.Errorf("could not get PGID of process %s PID %d reason: %s", name, maybeRunningProcess.Cmd.Process.Pid, err.Error())
+	}
+
+	return syscall.Kill(-pgid, sig)
 }
-
-// TODO: signature - some kind of pipe?
-//func GetProcessLogs(name string) error {
-//	return nil
-//}
-
-// TODO: signature - some new struct
-//func GetProcessDetails(name string) error {
-//	return nil
-//}
 
 func (b *Bussin) isRunning(name string) bool {
 	for _, v := range b.RunningProcesses {

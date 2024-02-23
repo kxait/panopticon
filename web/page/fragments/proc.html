@@ -1,5 +1,5 @@
 {{ define "proc" }}
-<tr id="proc--{{ .Name }}" class="bg-white odd:bg-gray-100">
+<tr id="proc--{{ .Name }}" class="odd:bg-gray-900 hover:bg-gray-700 cursor-pointer">
   <td>
     {{ if .HasLogs }}
     <a class="font-bold" href="/logs?proc={{ .Name }}">{{ .Name }}</a>
@@ -7,21 +7,18 @@
     {{ .Name }}
     {{ end }}
   </td>
-  {{ if .Running }}
   <td class="flex pl-2">
+    {{ if .Running }}
     <div>
       ✅
     </div>
+    {{ end }}
     <button hx-swap="outerHTML" hx-target="#proc--{{.Name}}" hx-post="/stop?proc={{ .Name }}">
       ⏹️
     </button>
-  </td>
-  {{ else }}
-  <td class="pl-2">
     <button hx-swap="outerHTML" hx-target="#proc--{{.Name}}" hx-post="/start?proc={{ .Name }}">
       ⏩️
     </button>
   </td>
-  {{ end }}
 </tr>
 {{ end }}
