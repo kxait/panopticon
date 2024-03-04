@@ -18,9 +18,12 @@ clean:
 # run with -j2
 watch: watch_tailwind watch_program
 
-watch_tailwind:
+watch-tailwind:
 	npm i
 	npx tailwind -i ./web/page/tailwind-src/main.css -o ./web/page/static/output.css --watch
 
-watch_program:
+watch-program:
 	wgo run -file .html . $(PANOP)
+
+install:
+	cp panopticon /usr/local/bin/panopticon

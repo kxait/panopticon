@@ -41,6 +41,8 @@ func main() {
 			case syscall.SIGCHLD:
 			case syscall.SIGURG:
 			case syscall.SIGPIPE:
+			case syscall.SIGWINCH:
+			case syscall.SIGPROF:
 				break
 			default:
 				{

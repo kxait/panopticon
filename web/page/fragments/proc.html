@@ -1,5 +1,8 @@
 {{ define "proc" }}
-<tr id="proc--{{ .Name }}" class="odd:bg-gray-900 hover:bg-gray-700 cursor-pointer">
+<tr id="proc-{{ .Name }}" class="odd:bg-gray-900 hover:bg-gray-700 cursor-pointer">
+  <td>
+    <input class="proc-check" type="checkbox" id="check-{{ .Name }}">
+  </td>
   <td>
     {{ if .HasLogs }}
     <a class="font-bold" href="/logs?proc={{ .Name }}">{{ .Name }}</a>
@@ -13,10 +16,10 @@
       ✅
     </div>
     {{ end }}
-    <button hx-swap="outerHTML" hx-target="#proc--{{.Name}}" hx-post="/stop?proc={{ .Name }}">
+    <button class="stop-button" hx-swap="outerHTML" hx-target="closest tr" hx-post="/stop?proc={{ .Name }}">
       ⏹️
     </button>
-    <button hx-swap="outerHTML" hx-target="#proc--{{.Name}}" hx-post="/start?proc={{ .Name }}">
+    <button class="start-button" hx-swap="outerHTML" hx-target="closest tr" hx-post="/start?proc={{ .Name }}">
       ⏩️
     </button>
   </td>
