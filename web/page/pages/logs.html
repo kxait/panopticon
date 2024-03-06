@@ -1,0 +1,36 @@
+{{ define "logs" }}
+<link rel="stylesheet" href="static/terminal.css">
+
+<body class="bg-black text-white">
+  <div><a href="/">&lt;&lt; return</a></div>
+  <div class="text-xl">{{ .Name }} ({{ .LogPath }})</div>
+  <script>
+    let scroll = true;
+    const toggleScroll = () => {
+      scroll = !scroll
+      document.getElementById("btn").innerText = scroll ? "✅" : "🔽"
+      if (scroll)
+        window.scrollTo(0, document.body.scrollHeight)
+    }
+
+    document.addEventListener("htmx:wsAfterMessage", ({detail}) => {
+      if (scroll)
+        window.scrollTo(0, document.body.scrollHeight)
+    })
+
+  </script>
+  <div id="lines" class="container m-auto term-container" hx-ext="ws"
+    ws-connect="/logs-live?proc={{.Name}}&offset={{.Size}}" onload="window.scrollTo(0, document.body.scrollHeight)">
+    {{ range .Lines }}{{ . }}
+{{ end }}
+  </div>
+  <div id="scroll-me" class="fixed bottom-[0] text-2xl">
+    <div>
+      <button onclick="window.scrollTo(0, 0)">🔼</button>
+    </div>
+    <div>
+      <button id="btn" onclick="toggleScroll()">✅</button>
+    </div>
+  </div>
+</body>
+{{ end }}

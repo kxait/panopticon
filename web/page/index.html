@@ -1,11 +1,3 @@
 {{ template "head" }}
 
-<body class="bg-black text-white">
-  <div class="container m-auto max-w-xl" hx-ws="connect:/process-status">
-    <table>
-      {{ range .procs }}
-      {{ template "proc" . }}
-      {{ end }}
-    </table>
-  </div>
-</body>
+{{ template "index" . }}
