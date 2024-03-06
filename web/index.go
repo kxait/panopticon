@@ -31,6 +31,7 @@ func (p *PanelServer) Index(c echo.Context) error {
 		for _, vv := range runningProcs {
 			if v.Name == vv.Proc.Name {
 				maybeRunningProc = &vv
+				break
 			}
 		}
 

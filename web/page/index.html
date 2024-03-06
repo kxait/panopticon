@@ -1,3 +1,17 @@
 {{ template "head" }}
 
-{{ template "index" . }}
+<script type="application/javascript" src="/static/index.js"></script>
+
+<body class="bg-black text-white" onload="onload()">
+  <div class="container m-auto max-w-xl" hx-ws="connect:/process-status">
+    <div class="text-lg">
+      on selected:&nbsp;
+      <button onclick="startSelected()">⏯</button> <button onclick="stopSelected()">⏹</button>
+    </div>
+    <table>
+      {{ range .procs }}
+      {{ template "proc" . }}
+      {{ end }}
+    </table>
+  </div>
+</body>
